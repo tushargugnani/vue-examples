@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="root">
+        <step-wizard>
+            <tab name="Step 1" :selected="true">
+                This is step 1 of multi-step process.
+            </tab>
+            <tab name="Step 2" >
+               This is step 2 of multi-step process.
+            </tab>
+            <tab name="Step 3">
+               This is step 3 of multi-step process.
+            </tab>  
+        </step-wizard>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        Vue.component('step-wizard',{
+
+            template:`<div>
+                <div class="tab-details">
+                    <slot></slot>
+                </div>
+
+                <br/>
+                <button @click="changeTab(--currentActive)" v-if="currentActive > 0">Previous</button>
+                <button @click="changeTab(++currentActive)" v-if="currentActive < totalTabs - 1">Next</button>
+                <button v-if="currentActive == totalTabs -1">Submit</button>
+                
+            </div>`,
+
+            data(){
+                return{
+                    tabs: [],
+                    currentActive: 0,
+                    totalTabs: 0,
+                }
+            },
+
+            created(){
+                this.tabs = this.$children;
+                
+            },
+
+            mounted(){
+                this.totalTabs = this.tabs.length;
+            },
+
+            methods:{
+                changeTab(makeTabActive){
+                    this.tabs.forEach(tab => {
+                       tab.isActive = false;
+                    });
+                    
+                    this.tabs[makeTabActive].isActive = true;
+                }
+            }
+        });
+
+        Vue.component('tab',{
+            template: `<div v-show="isActive"><h3>{{name}}</h3><slot></slot></div>`,
+
+            props: {
+                name:{required: true},
+                selected: { default: false}
+            },
+
+            data(){
+                return{
+                    isActive: false
+                }
+            },
+
+            created(){
+                this.isActive = this.selected
+            }
+        })
+
+        let app = new Vue({
+            el: '#root'
+        });
+    </script>
+</body>
+</html>
